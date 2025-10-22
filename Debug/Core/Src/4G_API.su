@@ -1,0 +1,9 @@
+../Core/Src/4G_API.c:21:20:sim_writeln	24	static
+../Core/Src/4G_API.c:43:11:sim_wait_result	192	static
+../Core/Src/4G_API.c:85:6:sim_wait_prompt	128	static
+../Core/Src/4G_API.c:128:6:sim_cmd_expect_ok	24	static
+../Core/Src/4G_API.c:150:6:utf8ToUcs2Hex	32	static
+../Core/Src/4G_API.c:181:6:encodePhoneNumberPDU	72	static
+../Core/Src/4G_API.c:220:6:buildPDU	1160	static
+../Core/Src/4G_API.c:261:6:sim_init	16	static
+../Core/Src/4G_API.c:283:6:send_SMS	712	static
