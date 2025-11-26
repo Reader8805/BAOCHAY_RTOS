@@ -1,0 +1,3 @@
+../Core/Src/gateway_button.c:3:6:button_toggle	16	static
+../Core/Src/gateway_button.c:7:6:button_write	16	static
+../Core/Src/gateway_button.c:11:9:button_read	24	static

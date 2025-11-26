@@ -20,7 +20,7 @@ typedef enum {
 	SIM_RES_CMS,
 	SIM_RES_ERROR
 } sim_res_t;
-
+uint8_t waitForPrompt(UART_HandleTypeDef *uart_sim, char ch);
 sim_res_t sim_wait_result(UART_HandleTypeDef *uart_sim, uint32_t total_ms);
 bool sim_wait_prompt(UART_HandleTypeDef *uart_sim, uint32_t max_ms);
 void sim_cmd_expect_ok(UART_HandleTypeDef *uart_sim, const char *cmd, uint32_t wait_ms);

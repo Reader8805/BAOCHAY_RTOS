@@ -10,7 +10,7 @@ void button_write(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState
 
 uint8_t button_read(GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin) {
 	uint8_t status = 0;
-	if(HAL_GPIO_ReadPin(GPIOx, GPIO_Pin) == HAL_OK) {
+	if(HAL_GPIO_ReadPin(GPIOx, GPIO_Pin) == 1) {
 		status = 1;
 		return status;
 	}

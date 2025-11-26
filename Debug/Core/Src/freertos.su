@@ -1,0 +1,6 @@
+../Core/Src/freertos.c:91:6:MX_FREERTOS_Init	192	static
+../Core/Src/freertos.c:141:6:Task_Sensor	16	static
+../Core/Src/freertos.c:159:6:Task_ServerUpload	16	static
+../Core/Src/freertos.c:178:6:Task_LCD_Menu	16	static
+../Core/Src/freertos.c:190:6:Task_Alert	16	static
+../Core/Src/freertos.c:202:6:Task_Modem	16	static
