@@ -1,6 +1,0 @@
-../Core/Src/freertos.c:91:6:MX_FREERTOS_Init	1
-../Core/Src/freertos.c:141:6:Task_Sensor	1
-../Core/Src/freertos.c:159:6:Task_ServerUpload	1
-../Core/Src/freertos.c:178:6:Task_LCD_Menu	1
-../Core/Src/freertos.c:190:6:Task_Alert	1
-../Core/Src/freertos.c:202:6:Task_Modem	1

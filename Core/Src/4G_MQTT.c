@@ -11,9 +11,12 @@ static int  sendATwait(const char *cmd, const char *waitFor, uint32_t timeout);
 static void waitForOK(uint32_t timeout);
 static void mqttPublish(const char *topic, const char *payload);
 
-// ===== Common helpers =====
-static uint32_t millis(void) { return HAL_GetTick(); }
-static void delay_ms(uint32_t ms){ HAL_Delay(ms); }
+static uint32_t millis(void) {
+	return HAL_GetTick();
+}
+static void delay_ms(uint32_t ms) {
+	HAL_Delay(ms);
+}
 
 static void dbg(const char *fmt, ...)
 {
@@ -38,7 +41,7 @@ static void uart2_sendLine(const char *s)
     dbg(">> %s\r\n", s);
 }
 
-// Đọc đến khi thấy chuỗi needle
+
 static int uart2_readUntil(char *buf, size_t buflen,const char *needle,uint32_t timeout)
 {
     uint32_t t0 = millis();
@@ -89,7 +92,7 @@ static int sendATwait(const char *cmd,const char *waitFor,uint32_t timeout){
     return 0;
 }
 
-// ===== MQTT FLOW =====
+
 static void mqtt_start(void)
 {
     sendAT("AT+CMQTTSTART",3000);
@@ -160,4 +163,4 @@ void A7640_Publish(int data, const char *c)
 
 
 }
-//"{\"smoke\":%d}"
+

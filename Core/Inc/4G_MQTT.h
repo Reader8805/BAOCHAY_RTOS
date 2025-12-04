@@ -32,10 +32,11 @@
 #ifndef __4G_MQTT_H__
 #define __4G_MQTT_H__
 
-#include "stm32f4xx_hal.h" // sửa theo chip của bạn
+#include "stm32f4xx_hal.h" // sửa theo chip
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+
 extern UART_HandleTypeDef huart1; // DEBUG UART
 extern UART_HandleTypeDef huart2; // SIM UART
 

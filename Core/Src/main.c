@@ -18,12 +18,11 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "cmsis_os.h"
-#include "4G_API.h"
-#include "4G_MQTT.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "zigbee_e18.h"
+#include "stdio.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -46,13 +45,6 @@
 UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
-/* Definitions for defaultTask */
-osThreadId_t defaultTaskHandle;
-const osThreadAttr_t defaultTask_attributes = {
-  .name = "defaultTask",
-  .stack_size = 128 * 4,
-  .priority = (osPriority_t) osPriorityNormal,
-};
 /* USER CODE BEGIN PV */
 //const char *phone_number[] = {
 //		"+84827402199",
@@ -60,9 +52,9 @@ const osThreadAttr_t defaultTask_attributes = {
 //		};
 //int number_of_phone = sizeof(phone_number) / sizeof(phone_number[0]);
 //const char *message = "Có cháy tại địa chỉ: \"Đại học Bách Khoa Hà Nội\"";
-int smoke;
-int temp;
-
+//int smoke;
+//int temp;
+uint16_t  TARGET_PANID   = 0x1234;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -70,8 +62,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
-void StartDefaultTask(void *argument);
-
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -118,44 +108,20 @@ int main(void)
 //	  send_SMS(&huart1, phone_number[i], message);
 //  }
 //  mqttt4GConfig(&huart1, VINAPHONE, ACCESS_TOKEN);
-  A7640_Init();
+  //A7640_Init();
+
+  E18_Init_UART(&huart1);
+  E18_SwitchToHexMode();
+  E18_Init(E18_NODE_COORDINATOR, TARGET_PANID, 11);
+  E18_StartNetwork();
+  for(int i=0; i<5; i++) {
+        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+        HAL_Delay(200);
+   }
+  HAL_Delay(3000);
+
+  E18_SwitchToTransparentMode();
   /* USER CODE END 2 */
-
-  /* Init scheduler */
- // osKernelInitialize();
-
-  /* USER CODE BEGIN RTOS_MUTEX */
-  /* add mutexes, ... */
-  /* USER CODE END RTOS_MUTEX */
-
-  /* USER CODE BEGIN RTOS_SEMAPHORES */
-  /* add semaphores, ... */
-  /* USER CODE END RTOS_SEMAPHORES */
-
-  /* USER CODE BEGIN RTOS_TIMERS */
-  /* start timers, add new ones, ... */
-  /* USER CODE END RTOS_TIMERS */
-
-  /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
-  /* USER CODE END RTOS_QUEUES */
-
-  /* Create the thread(s) */
-  /* creation of defaultTask */
- // defaultTaskHandle = osThreadNew(StartDefaultTask, NULL, &defaultTask_attributes);
-
-  /* USER CODE BEGIN RTOS_THREADS */
-  /* add threads, ... */
-  /* USER CODE END RTOS_THREADS */
-
-  /* USER CODE BEGIN RTOS_EVENTS */
-  /* add events, ... */
-  /* USER CODE END RTOS_EVENTS */
-
-  /* Start scheduler */
- // osKernelStart();
-
-  /* We should never get here as control is now taken by the scheduler */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -168,12 +134,21 @@ int main(void)
 //	 sprintf(txBuf, "{\"smoke\":%d}", smoke);
 //	 mqttPublish(&huart1, "v1/devices/me/telemetry", txBuf);
 //	 HAL_Delay(10000);
-     smoke = rand() % 100;
-     temp = rand() % 100;
+//     smoke = rand() % 100;
+//     temp = rand() % 100;
+//
+//      A7640_Publish(smoke, "smoke");
+//      A7640_Publish(temp, "temp");
+//      HAL_Delay(10000);
+	  char msg[64];
+	      static int count = 0;
+	      sprintf(msg, "Send to End Node\r\n", count++);
 
-      A7640_Publish(smoke, "smoke");
-      A7640_Publish(temp, "temp");
-      HAL_Delay(10000);
+	      HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 100);
+
+	      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13); // Nháy đèn báo đã gửi
+	      HAL_Delay(10000);
+
   }
   /* USER CODE END 3 */
 }
@@ -297,12 +272,24 @@ static void MX_USART2_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
@@ -312,24 +299,6 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
-
-/* USER CODE BEGIN Header_StartDefaultTask */
-/**
-  * @brief  Function implementing the defaultTask thread.
-  * @param  argument: Not used
-  * @retval None
-  */
-/* USER CODE END Header_StartDefaultTask */
-void StartDefaultTask(void *argument)
-{
-  /* USER CODE BEGIN 5 */
-  /* Infinite loop */
-  for(;;)
-  {
-    osDelay(1);
-  }
-  /* USER CODE END 5 */
-}
 
 /**
   * @brief  This function is executed in case of error occurrence.
