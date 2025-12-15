@@ -112,32 +112,29 @@ int main(void)
 
   E18_Init_UART(&huart1);
 
-    // Thử Init tối đa 5 lần
     bool init_ok = false;
     for(int i=0; i<5; i++) {
-        if (E18_Init(E18_NODE_COORDINATOR, TARGET_PANID, 11)) {
+        if (E18_Init(E18_NODE_END_DEVICE, TARGET_PANID, 11)) {
             init_ok = true;
-            break; // Thành công
+            break;
         }
-        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13); // Nháy đèn báo đang thử lại
+        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
         HAL_Delay(500);
     }
 
-    if (init_ok) {
-        // Đèn sáng đứng báo thành công
-        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-    } else {
-        // Đèn nháy nhanh báo thất bại toàn tập
-        while(1) {
-            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-            HAL_Delay(50);
-        }
-    }
-    E18_StartNetwork();
+    if (!init_ok) {
 
-   // HAL_Delay(2000);
+        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    }
+    for(int i=0; i<3; i++) {
+          if (E18_StartNetwork()) break;
+          HAL_Delay(1000);
+      }
     // Chuyển sang mode transparent
-   // E18_SwitchToTransparentMode();
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_Delay(2000);
+    E18_SwitchToTransparentMode();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -157,13 +154,12 @@ int main(void)
 //      A7640_Publish(smoke, "smoke");
 //      A7640_Publish(temp, "temp");
 //      HAL_Delay(10000);
-
 	  char msg[64];
-	        static int count = 0;
-	        sprintf(msg, "Send to End Node %d\r\n", count++);
-	        HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 100);
-	        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-	        HAL_Delay(5000);
+	  static int count = 0;
+	  sprintf(msg, "Send to Coordinator %d\r\n", count++);
+	  HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 100);
+	  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	  HAL_Delay(10000);
 
   }
   /* USER CODE END 3 */

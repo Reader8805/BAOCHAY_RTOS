@@ -63,7 +63,7 @@ void E18_Init_UART(UART_HandleTypeDef *huart_handle) {
 
 void E18_SwitchToHexMode(void) {
     if (E18_UART_Handle == NULL) return;
-    HAL_Delay(500);
+    HAL_Delay(1200);
     HAL_UART_Transmit(E18_UART_Handle, (uint8_t*)"+++", 3, 100);
     HAL_Delay(1000);
 
@@ -131,11 +131,13 @@ bool E18_Init(uint8_t type, uint16_t panid, uint8_t channel) {
 
     // 1. Vào Hex Mode
     E18_SwitchToHexMode();
-
+    HAL_Delay(3000);
     // 2. Denetwork
 
     E18_ResetModule(MODULE_DENETWORK);
     HAL_Delay(3500);
+
+   // E18_StartNetwork();
 
     E18_SetNodeType(type);
     HAL_Delay(200);
