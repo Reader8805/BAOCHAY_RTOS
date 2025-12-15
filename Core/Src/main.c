@@ -54,7 +54,7 @@ UART_HandleTypeDef huart2;
 //const char *message = "Có cháy tại địa chỉ: \"Đại học Bách Khoa Hà Nội\"";
 //int smoke;
 //int temp;
-uint16_t  TARGET_PANID   = 0x1234;
+uint16_t  TARGET_PANID   = 0x5555;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -111,16 +111,32 @@ int main(void)
   //A7640_Init();
 
   E18_Init_UART(&huart1);
-  E18_SwitchToHexMode();
-  E18_Init(E18_NODE_COORDINATOR, TARGET_PANID, 11);
-  E18_StartNetwork();
-  for(int i=0; i<5; i++) {
-        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-        HAL_Delay(200);
-   }
-  HAL_Delay(3000);
 
-  E18_SwitchToTransparentMode();
+    // Thử Init tối đa 5 lần
+    bool init_ok = false;
+    for(int i=0; i<5; i++) {
+        if (E18_Init(E18_NODE_COORDINATOR, TARGET_PANID, 11)) {
+            init_ok = true;
+            break; // Thành công
+        }
+        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13); // Nháy đèn báo đang thử lại
+        HAL_Delay(500);
+    }
+
+    if (init_ok) {
+        // Đèn sáng đứng báo thành công
+        HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    } else {
+        // Đèn nháy nhanh báo thất bại toàn tập
+        while(1) {
+            HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+            HAL_Delay(50);
+        }
+    }
+
+   // HAL_Delay(2000);
+    // Chuyển sang mode truyền dữ liệu
+   // E18_SwitchToTransparentMode();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -140,14 +156,21 @@ int main(void)
 //      A7640_Publish(smoke, "smoke");
 //      A7640_Publish(temp, "temp");
 //      HAL_Delay(10000);
+//	  char msg[64];
+//	      static int count = 0;
+//	      sprintf(msg, "Send to End Node\r\n", count++);
+//
+//	      HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 100);
+//
+//	      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13); // Nháy đèn báo đã gửi
+//	      HAL_Delay(10000);
+
 	  char msg[64];
-	      static int count = 0;
-	      sprintf(msg, "Send to End Node\r\n", count++);
-
-	      HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 100);
-
-	      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13); // Nháy đèn báo đã gửi
-	      HAL_Delay(10000);
+	        static int count = 0;
+	        sprintf(msg, "Send to End Node %d\r\n", count++);
+	        HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 100);
+	        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	        HAL_Delay(5000); // Delay 5s gửi 1 lần
 
   }
   /* USER CODE END 3 */
