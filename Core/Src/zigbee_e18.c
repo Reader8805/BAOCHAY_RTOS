@@ -137,13 +137,6 @@ bool E18_Init(uint8_t type, uint16_t panid, uint8_t channel) {
     E18_ResetModule(MODULE_DENETWORK);
     HAL_Delay(3500);
 
-    if (E18_StartNetwork()) {
-        // Có phản hồi 0x55 -> Tốt
-    } else {
-
-    }
-    HAL_Delay(2000);
-
     E18_SetNodeType(type);
     HAL_Delay(200);
 

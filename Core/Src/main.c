@@ -133,9 +133,10 @@ int main(void)
             HAL_Delay(50);
         }
     }
+    E18_StartNetwork();
 
    // HAL_Delay(2000);
-    // Chuyển sang mode truyền dữ liệu
+    // Chuyển sang mode transparent
    // E18_SwitchToTransparentMode();
   /* USER CODE END 2 */
 
@@ -156,21 +157,13 @@ int main(void)
 //      A7640_Publish(smoke, "smoke");
 //      A7640_Publish(temp, "temp");
 //      HAL_Delay(10000);
-//	  char msg[64];
-//	      static int count = 0;
-//	      sprintf(msg, "Send to End Node\r\n", count++);
-//
-//	      HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 100);
-//
-//	      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13); // Nháy đèn báo đã gửi
-//	      HAL_Delay(10000);
 
 	  char msg[64];
 	        static int count = 0;
 	        sprintf(msg, "Send to End Node %d\r\n", count++);
 	        HAL_UART_Transmit(&huart1, (uint8_t*)msg, strlen(msg), 100);
 	        HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-	        HAL_Delay(5000); // Delay 5s gửi 1 lần
+	        HAL_Delay(5000);
 
   }
   /* USER CODE END 3 */
